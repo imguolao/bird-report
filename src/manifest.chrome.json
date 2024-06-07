@@ -16,7 +16,11 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["src/contents/index.html", "src/contents/index.tsx"],
+      "resources": [
+        "src/contents/index.html",
+        "src/contents/index.tsx",
+        "src/contents/request/index.ts"
+      ],
       "matches": ["https://www.birdreport.cn/*"]
     }
   ]
