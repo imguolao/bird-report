@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "author": "Gromo",
+  "icons": {
+    "16": "icon/16.png",
+    "32": "icon/32.png",
+    "48": "icon/48.png",
+    "96": "icon/96.png",
+    "128": "icon/128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.birdreport.cn/*"],
+      "js": ["src/contents/content.ts"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/contents/index.html", "src/contents/index.tsx"],
+      "matches": ["https://www.birdreport.cn/*"]
+    }
+  ]
+}
