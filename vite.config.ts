@@ -22,9 +22,12 @@ export default defineConfig({
     webExtension({
       manifest: generateManifest,
       webExtConfig: {
-        startUrl: 'https://www.birdreport.cn',
+        startUrl: "https://www.birdreport.cn",
       },
-      additionalInputs: ['src/contents/index.html'],
+      additionalInputs: [
+        "src/contents/index.html",
+        "src/contents/request/index.ts",
+      ],
     }),
   ],
 });

@@ -1,12 +1,4 @@
-// import type { Base64 } from 'js-base64';
-
-interface Window {
-  Base64: any,
-  BIRDREPORT_APIJS: any,
-  site: {
-    domain: string;
-  }
-}
+import { IFRAME_ID } from '../const';
 
 type BirdResponse<T = any> = {
   code: number;
@@ -14,7 +6,7 @@ type BirdResponse<T = any> = {
   data: T[];
 }
 
-type Province = {
+export type Province = {
   province_code: string;
   province_name: string;
 }
@@ -96,72 +88,105 @@ type TaxonResult = {
   taxonordername: string;
 }
 
-function apiProvince () {
-  return new Promise<Province[]>((resolve, reject) => {
-    try {
-      $.post(window.site.domain + 'front/system/adcode/province', (response: BirdResponse<Province>) => {
-        resolve(response.data ?? []);
-      });
-    } catch (e) {
-      reject(e);
-    }
-  });
-}
-
-function apiCity (provinceCode: string) {
-  return new Promise<City[]>((resolve, reject) => {
-    try {
-      $.post(
-        window.site.domain + 'front/system/adcode/city',
-        {
-          province_code: provinceCode
-        },
-        (response: BirdResponse<City>) => {
+export const FetchAPI = {
+  province() {
+    return new Promise<Province[]>((resolve, reject) => {
+      try {
+        $.post(window.site.domain + 'front/system/adcode/province', (response: BirdResponse<Province>) => {
           resolve(response.data ?? []);
-        }
-      );
-    } catch (e) {
-      reject(e);
-    }
-  });
-}
-
-function apiDistrict (cityCode: string) {
-  return new Promise<District[]>((resolve, reject) => {
-    try {
-      $.post(
-        window.site.domain + 'front/system/adcode/district',
-        {
-          city_code: cityCode
-        },
-        ({ data = [] }: BirdResponse<District>) => {
-          resolve(data);
-        }
-      );
-    } catch (e) {
-      reject(e);
-    }
-  });
+        });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  },
+  
+  city(provinceCode: string) {
+    return new Promise<City[]>((resolve, reject) => {
+      try {
+        $.post(
+          window.site.domain + 'front/system/adcode/city',
+          {
+            province_code: provinceCode
+          },
+          (response: BirdResponse<City>) => {
+            resolve(response.data ?? []);
+          }
+        );
+      } catch (e) {
+        reject(e);
+      }
+    });
+  },
+  
+  district(cityCode: string) {
+    return new Promise<District[]>((resolve, reject) => {
+      try {
+        $.post(
+          window.site.domain + 'front/system/adcode/district',
+          {
+            city_code: cityCode
+          },
+          ({ data = [] }: BirdResponse<District>) => {
+            resolve(data);
+          }
+        );
+      } catch (e) {
+        reject(e);
+      }
+    });
+  },
+  
+  taxon(queryParams: WhereQueryParam) {
+    return new Promise<{
+      code: number,
+      count: number,
+      data: TaxonResult[],
+    }>((resolve, reject) => {
+      try {
+        $.post(window.site.domain+ 'front/record/activity/taxon', queryParams, (res: TaxonResponse) => {
+          const decode_str = window.BIRDREPORT_APIJS.decode(res.data);
+          const results = JSON.parse(decode_str);
+          resolve({
+            code: res.code,
+            count: res.count,
+            data: results
+          });
+        });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
 };
 
-function apiTaxon(queryParams: WhereQueryParam) {
-  return new Promise<{
-    code: number,
-    count: number,
-    data: TaxonResult[],
-  }>((resolve, reject) => {
-    try {
-      $.post(window.site.domain+ 'front/record/activity/taxon', queryParams, (res: TaxonResponse) => {
-        const decode_str = window.BIRDREPORT_APIJS.decode(res.data);
-        const results = JSON.parse(decode_str);
-        resolve({
-          code: res.code,
-          count: res.count,
-          data: results
-        });
-      });
-    } catch (e) {
-      reject(e);
-    }
-  });
+type QueryApi = typeof FetchAPI;
+
+export type QueryMessage<T extends keyof QueryApi = any> = {
+  type: T;
+  params: Parameters<QueryApi[T]>
 }
+
+export type ResponseMessage<T> = {
+  type: string,
+  data: T,
+}
+
+function sendResponse(type: any, data: any) {
+  const iframe = document.getElementById(IFRAME_ID) as unknown as HTMLIFrameElement;
+  iframe.contentWindow?.postMessage({
+    type,
+    data,
+  }, '*');
+}
+
+window.addEventListener('message', async ({ data }) => {
+  if (!Object.hasOwn(FetchAPI, data.type)) {
+    return;
+  }
+
+  // @ts-ignore
+  const query = FetchAPI[data.type];
+  const response = await query.apply(null, data.params);
+  sendResponse(data.type, response);
+});

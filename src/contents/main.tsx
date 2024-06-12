@@ -1,13 +1,6 @@
 import { createRoot } from 'react-dom/client';
-
-const App: React.FC = () => {
-  return (
-    <div>
-      <h1>Hello from iframe!</h1>
-      <p>This content is rendered by React.</p>
-    </div>
-  );
-};
+import App from './App';
+import './app.css';
 
 const container = document.getElementById('app');
 const root = createRoot(container!);
