@@ -11,14 +11,14 @@ export type Province = {
   province_name: string;
 }
 
-type City = {
+export type City = {
   city_code: string;
   city_name: string;
 }
 
-type District = {
-  "district_name": string;
-  "district_code": string;
+export type District = {
+  district_name: string;
+  district_code: string;
 }
 
 type WhereQueryParam = {

@@ -24,7 +24,7 @@ export default function Header() {
       </NavbarBrand>
       <NavbarContent justify="center">
         <NavbarItem>
-          聚合查询
+          <span className="text-[20px]">Bird Report Query</span>
         </NavbarItem>
       </NavbarContent>
       <NavbarContent justify="end">

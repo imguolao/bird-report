@@ -75,7 +75,6 @@ function displayIFrame(show: boolean) {
 function onMessage() {
   window.addEventListener('message', ({ data }) => {
     if (data?.type !== IFRAME_ID || !Object.hasOwn(data, 'open')) {
-      log(Object.hasOwn(data, 'open'))
       return;
     }
 
