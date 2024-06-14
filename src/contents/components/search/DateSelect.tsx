@@ -9,11 +9,13 @@ import {
 } from '@nextui-org/react';
 import Field from './Field';
 
+export type RangeDate = {
+  start: string;
+  end: string;
+}
+
 export default function DateSelect(props: ComponentProps<'div'> & {
-  onSelectChange?: (rangeDate: {
-    start: string;
-    end: string;
-  }) => void;
+  onSelectChange?: (rangeDate: RangeDate) => void;
 }) {
   const { onSelectChange, ...restProps } = props;
   const [value, setValue] = useState<RangeValue<DateValue>>()

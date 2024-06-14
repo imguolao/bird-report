@@ -22,14 +22,15 @@ import Field from './Field';
 
 function DistrictSelect(props: Omit<AutocompleteProps, 'children'> & {
   cityCode?: string;
-  onSelectChange?: (districtCode: string | undefined) => void;
+  onSelectChange?: (districtCode: District | undefined) => void;
 }) {
   const { onSelectChange, cityCode, ...restProps } = props;
   const [district, setDistrict] = useState<District["district_code"] | undefined>();
   const [districts, setDistricts] = useState<District[]>([]);
   const handleSelect = (districtCode: string | undefined) => {
+    const d = districts.find(item => item.district_code === districtCode);
     setDistrict(districtCode);
-    onSelectChange?.(districtCode);
+    onSelectChange?.(d);
   }
 
   useEffect(() => {
@@ -65,14 +66,15 @@ function DistrictSelect(props: Omit<AutocompleteProps, 'children'> & {
 
 function CitySelect(props: Omit<AutocompleteProps, 'children'> & {
   provinceCode?: string;
-  onSelectChange?: (cityCode: string | undefined) => void;
+  onSelectChange?: (city: City | undefined) => void;
 }) {
   const { provinceCode, onSelectChange, ...restProps } = props;
   const [cities, setCities] = useState<City[]>([]);
   const [city, setCity] = useState<City["city_code"] | undefined>();
   const handleSelect = (cityCode: string | undefined) => {
+    const c = cities.find(item => item.city_code === cityCode);
     setCity(cityCode);
-    onSelectChange?.(cityCode);
+    onSelectChange?.(c);
   }
 
   useEffect(() => {
@@ -107,15 +109,16 @@ function CitySelect(props: Omit<AutocompleteProps, 'children'> & {
 }
 
 function ProvinceSelect(props: Omit<AutocompleteProps, 'children'> & {
-  provinceCode?: string;
-  onSelectChange?: (provinceCode: string | undefined) => void;
+  province?: Province;
+  onSelectChange?: (province: Province | undefined) => void;
 }) {
-  const { provinceCode, onSelectChange, ...restProps } = props;
-  const [province, setProvince] = useState<Province['province_code'] | undefined>(provinceCode);
+  const { province, onSelectChange, ...restProps } = props;
+  const [provinceCode, setProvinceCode] = useState<Province['province_code'] | undefined>(province?.province_code);
   const [provinces, setProvinces] = useState<Province[]>([]);
-  const handleSelect = (provinceCode: string | undefined) => {
-    setProvince(provinceCode);
-    onSelectChange?.(provinceCode);
+  const handleSelectChange = (provinceCode: string | undefined) => {
+    const p = provinces.find(item => item.province_code === provinceCode);
+    setProvinceCode(provinceCode);
+    onSelectChange?.(p);
   }
 
   useEffect(() => {
@@ -132,8 +135,8 @@ function ProvinceSelect(props: Omit<AutocompleteProps, 'children'> & {
       {...restProps}
       size="sm"
       label="省/直辖市"
-      selectedKey={province}
-      onSelectionChange={key => handleSelect(key as string)}>
+      selectedKey={provinceCode}
+      onSelectionChange={key => handleSelectChange(key as string)}>
       {provinces.map(({ province_code, province_name }) => (
         <AutocompleteItem key={province_code}>
           {province_name}
@@ -144,55 +147,56 @@ function ProvinceSelect(props: Omit<AutocompleteProps, 'children'> & {
 }
 
 export type Area = {
-  provinceCode?: Province['province_code'];
-  cityCode?: City['city_code'];
-  districtCode?: District['district_code'];
+  province?: Province;
+  city?: City;
+  district?: District;
 }
 
 export default function AreaSelect(props: ComponentProps<'div'> & {
-  onSelectionChange?: (area: Area) => void;
+  area?: Area,
+  onSelectChange?: (area: Area) => void;
 }) {
-  const { onSelectionChange, ...restProps } = props;
-  const [area, setArea] = useState<Area>({});
-  const handleDistrictSelect = (districtCode: string | undefined) => {
+  const { area: propsArea, onSelectChange, ...restProps } = props;
+  const [area, setArea] = useState<Area>(propsArea ?? {});
+  const handleDistrictSelect = (district: District | undefined) => {
     const newArea = {
       ...area,
-      districtCode,
+      district,
     };
     setArea(newArea);
-    onSelectionChange?.(newArea);
+    onSelectChange?.(newArea);
   }
 
-  const handleCitySelect = (cityCode: string | undefined) => {
+  const handleCitySelect = (city: City | undefined) => {
     const newArea = {
-      provinceCode: area.provinceCode,
-      cityCode,
+      province: area.province,
+      city,
     };
     setArea(newArea);
-    onSelectionChange?.(newArea);
+    onSelectChange?.(newArea);
   }
 
-  const handleProvinceSelect = (provinceCode: string | undefined) => {
-    const newArea = { provinceCode };
+  const handleProvinceSelect = (province: Province | undefined) => {
+    const newArea = { province };
     setArea(newArea);
-    onSelectionChange?.(newArea);
+    onSelectChange?.(newArea);
   }
 
   return (
     <Field label="区域" {...restProps}>
       <ProvinceSelect
         className="w-[200px] mr-[10px]"
-        provinceCode={area.provinceCode} 
+        province={area.province} 
         onSelectChange={handleProvinceSelect} 
       />
       <CitySelect
         className="w-[200px] mr-[10px]"
-        provinceCode={area.provinceCode} 
+        provinceCode={area.province?.province_code} 
         onSelectChange={handleCitySelect} 
       />
       <DistrictSelect
         className="w-[200px]"
-        cityCode={area.cityCode} 
+        cityCode={area.city?.city_code} 
         onSelectChange={handleDistrictSelect} 
       />
     </Field>

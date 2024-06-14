@@ -5,6 +5,13 @@ import type {
   City,
   District,
 } from './index';
+import { type Area } from '../components/search/AreaSelect';
+import { type RangeDate } from '../components/search/DateSelect';
+
+type TaxonParam = {
+  area?: Area;
+  rangeDate?: RangeDate;
+}
 
 export async function getProvince() {
   return new Promise<Province[]>((resolve, reject) => {
@@ -70,4 +77,19 @@ export async function getDistrict(cityCode: string) {
       reject(e);
     }
   });
+}
+
+export async function getTaxon(params: TaxonParam[]) {
+
+}
+
+function normalizeTaxonParams(params: TaxonParam[]) {
+  const filterParams = params.filter(({ area, rangeDate }) => {
+    const hasArea = !!area && !!Object.keys(area).length;
+    const hasDate = !!rangeDate;
+    return hasArea || hasDate;
+  });
+
+  // same location
+  
 }
