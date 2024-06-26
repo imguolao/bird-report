@@ -53,7 +53,7 @@ function DistrictSelect(props: Omit<AutocompleteProps, 'children'> & {
       {...restProps}
       size="sm"
       label="区/县"
-      selectedKey={district}
+      selectedKey={district || ''}
       onSelectionChange={key => handleSelect(key as string)}>
       {districts.map(({ district_code, district_name }) => (
         <AutocompleteItem key={district_code}>
@@ -97,7 +97,7 @@ function CitySelect(props: Omit<AutocompleteProps, 'children'> & {
       {...restProps}
       size="sm"
       label="城市"
-      selectedKey={city}
+      selectedKey={city || ''}
       onSelectionChange={key => handleSelect(key as string)}>
       {cities.map(({ city_code, city_name }) => (
         <AutocompleteItem key={city_code}>
@@ -135,7 +135,7 @@ function ProvinceSelect(props: Omit<AutocompleteProps, 'children'> & {
       {...restProps}
       size="sm"
       label="省/直辖市"
-      selectedKey={provinceCode}
+      selectedKey={provinceCode || ''}
       onSelectionChange={key => handleSelectChange(key as string)}>
       {provinces.map(({ province_code, province_name }) => (
         <AutocompleteItem key={province_code}>

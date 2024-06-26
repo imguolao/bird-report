@@ -21,7 +21,7 @@ export type District = {
   district_code: string;
 }
 
-type WhereQueryParam = {
+export type WhereQueryParam = {
   city: string;
   ctime: string;
   district: string;
@@ -70,15 +70,15 @@ type TaxonResponse = {
   timestamp: number;
 }
 
-// englishname: "Ruddy Shelduck"
-// latinname: "Tadorna ferruginea"
-// recordcount: 9
-// taxon_id: 4096
-// taxonfamilyname: "鸭科"
-// taxonname: "赤麻鸭"
-// taxonordername: "雁形目"
+// 英文名称 englishname: "Ruddy Shelduck"
+// 拉丁学名 latinname: "Tadorna ferruginea"
+// 记录次数 recordcount: 9
+// 鸟种编号 taxon_id: 4096
+// 科 taxonfamilyname: "鸭科"
+// 中文名 taxonname: "赤麻鸭"
+// 目 taxonordername: "雁形目"
 
-type TaxonResult = {
+export type TaxonData = {
   englishname: string;
   latinname: string;
   recordcount: number;
@@ -86,6 +86,12 @@ type TaxonResult = {
   taxonfamilyname: string;
   taxonname: string;
   taxonordername: string;
+}
+
+export type TaxonResult = {
+  code: number,
+  count: number,
+  data: TaxonData[],
 }
 
 export const FetchAPI = {
@@ -138,11 +144,7 @@ export const FetchAPI = {
   },
   
   taxon(queryParams: WhereQueryParam) {
-    return new Promise<{
-      code: number,
-      count: number,
-      data: TaxonResult[],
-    }>((resolve, reject) => {
+    return new Promise<TaxonResult>((resolve, reject) => {
       try {
         $.post(window.site.domain+ 'front/record/activity/taxon', queryParams, (res: TaxonResponse) => {
           const decode_str = window.BIRDREPORT_APIJS.decode(res.data);
@@ -164,18 +166,21 @@ type QueryApi = typeof FetchAPI;
 
 export type QueryMessage<T extends keyof QueryApi = any> = {
   type: T;
+  key: string;
   params: Parameters<QueryApi[T]>
 }
 
 export type ResponseMessage<T> = {
-  type: string,
-  data: T,
+  type: string;
+  key: string;
+  data: T;
 }
 
-function sendResponse(type: any, data: any) {
+function sendResponse(type: any, data: any, key: string) {
   const iframe = document.getElementById(IFRAME_ID) as unknown as HTMLIFrameElement;
   iframe.contentWindow?.postMessage({
     type,
+    key,
     data,
   }, '*');
 }
@@ -188,5 +193,5 @@ window.addEventListener('message', async ({ data }) => {
   // @ts-ignore
   const query = FetchAPI[data.type];
   const response = await query.apply(null, data.params);
-  sendResponse(data.type, response);
+  sendResponse(data.type, response, data.key);
 });

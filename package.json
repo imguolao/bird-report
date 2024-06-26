@@ -11,6 +11,7 @@
     "build:chrome": "tsc && cross-env TARGET=chrome vite build"
   },
   "dependencies": {
+    "@internationalized/date": "^3.5.4",
     "@nextui-org/react": "^2.4.1",
     "framer-motion": "^11.2.10",
     "react": "^18.2.0",

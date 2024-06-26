@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useContext } from 'react';
 import {
   type Selection,
   Accordion,
@@ -8,6 +8,9 @@ import {
 import AreaSelect, { type Area } from './AreaSelect';
 import DateSelect, { type RangeDate } from './DateSelect';
 import CloseIcon from './CloseIcon';
+import { getTaxon } from '../../request/iframe_api';
+import { TaxonDataContext } from '../../context/taxon';
+import { log } from '../../../utils';
 
 type QueryParam = {
   key: string;
@@ -16,6 +19,7 @@ type QueryParam = {
 }
 
 export default function MultipleSearch() {
+  const { setTaxonResult } = useContext(TaxonDataContext);
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set(['0']));
   const [params, setParams] = useState<QueryParam[]>([{
     key: '0',
@@ -56,14 +60,18 @@ export default function MultipleSearch() {
 
   const handleParamAdd = () => {
     const key = new Date().getTime().toString();
-    const newParams = [...params, { key }];
-    console.log(newParams)
     setParams([...params, { key }]);
     setSelectedKeys(new Set([key]));
   }
 
-  const handleQuery = () => {
-    console.log(params)
+  const handleQuery = async () => {
+    try {
+      const result = await getTaxon(params);
+      // TODO: flat result
+      // setTaxonResult?.(result);
+    } catch (e) {
+      log(e);
+    }    
   }
 
   return (
@@ -83,7 +91,8 @@ export default function MultipleSearch() {
                   area={p.area}
                   onSelectChange={(area: Area) => handleAreaSelect(area, index)} 
                 />
-                <DateSelect 
+                <DateSelect
+                  rangeDate={p.rangeDate}
                   onSelectChange={(rangeDate: RangeDate) => handleRangeDateSelect(rangeDate, index)}
                 />
               </div>
