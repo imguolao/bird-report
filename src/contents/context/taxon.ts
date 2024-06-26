@@ -1,10 +1,10 @@
 import { createContext } from 'react';
-import { TaxonResult } from '../request';
+import { TaxonData } from '../request';
 
 export const TaxonDataContext = createContext<{
-  taxonResult: TaxonResult | undefined,
-  setTaxonResult: (data: TaxonResult) => void,
+  taxonData: TaxonData[],
+  setTaxonData: (data: TaxonData[]) => void,
 }>({
-  taxonResult: undefined,
-  setTaxonResult: () => {},
+  taxonData: [],
+  setTaxonData: () => {},
 })

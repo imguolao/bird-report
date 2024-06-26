@@ -3,19 +3,19 @@ import { NextUIProvider } from '@nextui-org/react';
 import Header from './components/header/Header';
 import MultipleSearch from './components/search/MultipleSearch';
 import DisplayData from './components/table/DisplayData';
-import { TaxonResult } from './request';
+import { TaxonData } from './request';
 import { TaxonDataContext } from './context/taxon';
 
 const App: React.FC = () => {
-  const [taxonResult, setTaxonResult] = useState<TaxonResult | undefined>(undefined);
+  const [taxonData, setTaxonData] = useState<TaxonData[]>([]);
 
   return (
     <NextUIProvider locale="zh-CN" className="h-full">
       <main className={"text-foreground bg-background h-full"}>
         <Header />
-        <TaxonDataContext.Provider value={{ taxonResult, setTaxonResult }}>
+        <TaxonDataContext.Provider value={{ taxonData, setTaxonData: (data: TaxonData[]) => setTaxonData(data) }}>
           <MultipleSearch />
-          <DisplayData />
+          <DisplayData className="mt-[10px]" />
         </TaxonDataContext.Provider>
       </main>
     </NextUIProvider>

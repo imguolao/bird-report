@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useContext } from 'react';
 import {
   Table,
   TableHeader,
@@ -10,19 +10,7 @@ import {
   Pagination,
   type TableProps,
 } from '@nextui-org/react';
-import { TaxonData } from '../../request';
-
-// const rows = [
-//   {
-//     englishname: 'Koklass Pheasant',
-//     latinname: 'Pucrasia macrolopha',
-//     recordcount: 3,
-//     taxon_id: 4022,
-//     taxonfamilyname: '雉科',
-//     taxonname: '勺鸡',
-//     taxonordername: '鸡形目',
-//   }
-// ];
+import { TaxonDataContext } from '../../context/taxon';
 
 const columns = [
   {
@@ -55,23 +43,21 @@ const columns = [
   },
 ];
 
-export default function DataGrid(props: {
-  data?: TaxonData[],
-} & TableProps) {
-  const { data = [], ...restProps } = props;
+export default function DataGrid(props: TableProps) {
+  const { taxonData } = useContext(TaxonDataContext);
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
-  const pages = Math.ceil(data.length / rowsPerPage);
+  const pages = Math.ceil(taxonData.length / rowsPerPage);
   const items = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
 
-    return data.slice(start, end);
-  }, [page, data]);
+    return taxonData.slice(start, end);
+  }, [page, taxonData]);
 
   return (
     <Table
-      {...restProps}
+      {...props}
       bottomContent={
         pages > 0 ? (
           <div className="flex w-full justify-center">
